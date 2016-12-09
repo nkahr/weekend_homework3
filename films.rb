@@ -2,13 +2,24 @@ require_relative('db/sql_runner.rb')
 class Film
 
   attr_reader :id
-  attr_accessor :title, :price, :customer_count
+  attr_accessor :title, :price, :customer_count, :ticket_limit
 
   def initialize(film_hash)
     @id = film_hash['id'].to_i() unless film_hash['id'].nil?
     @title = film_hash['title']
     @price = film_hash['price']
     @customer_count = 0
+    @ticket_limit = film_hash['ticket_limit']
+  end
+
+  def most_popular_time()
+    sql = "
+      SELECT time
+      FROM tickets
+      GROUP BY time
+      ORDER BY COUNT(*) DESC
+      LIMIT 1;"
+      return SqlRunner.run(sql)[0]['time']
   end
 
   def save()

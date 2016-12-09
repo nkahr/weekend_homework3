@@ -14,13 +14,18 @@ class Customer
     @ticket_count = 0
   end
 
-  def buy_ticket(film)
-    ticket = Ticket.new("customer_id" => @id, "film_id" => film.id())
-    ticket.save()
-    @funds -= film.price()
-    @ticket_count += 1
-    film.customer_count += 1
+  def buy_ticket(film, time_str)
+    if @funds > film.price && film.customer_count < film.ticket_limit
+      ticket = Ticket.new("customer_id" => @id, "film_id" => film.id(), 'time' => time_str)
+      ticket.save()
+      @funds -= film.price()
+      @ticket_count += 1
+      film.customer_count += 1
+    else
+      return "could not buy ticket"
+    end
   end
+
 
   def save()
     sql = "INSERT INTO customers (name, funds) VALUES ('#{@name}', #{@funds}) RETURNING *;"
@@ -54,10 +59,10 @@ class Customer
 
   def get_films()
     sql ="
-    SELECT f.*, t.* FROM films f 
-    INNER JOIN tickets t 
-    ON t.film_id = f.id
-    WHERE t.customer_id = #{@id};"
+    SELECT films.* FROM films
+    INNER JOIN tickets
+    ON tickets.film_id = films.id
+    WHERE tickets.customer_id = #{@id};"
     return Film.get_many(sql)
   end 
 
