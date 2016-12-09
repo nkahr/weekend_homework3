@@ -16,5 +16,34 @@ class Ticket
     @id = SqlRunner.run(sql)[0]['id']
   end
 
+  def get()
+    sql = "SELECT * FROM tickets WHERE id = #{@id};"
+    return Ticket.new(SqlRunner.run(sql)[0])
+  end
+
+  def self.get_all()
+    sql = "SELECT * FROM tickets;"
+    return Ticket.get_many(sql)
+  end
+
+  def delete()
+    sql = "DELETE FROM tickets where id = #{@id};"
+    SqlRunner.run(sql)
+  end
+
+  def self.delete_all()
+    sql = "DELETE FROM tickets;"
+    SqlRunner.run(sql)
+  end
+
+  def update()
+    sql = "UPDATE tickets WHERE id = #{@id};"
+    SqlRunner.run(sql)
+  end
+
+  def self.get_many(sql)
+    result = SqlRunner.run(sql)
+    return result.map{|ticket| Ticket.new(ticket)}
+  end
 
 end
